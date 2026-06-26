@@ -5,6 +5,7 @@ A small collection of [Claude](https://claude.com/claude-code) skills.
 | Skill | What it does |
 |-------|--------------|
 | [`decompose`](skills/decompose) | Break a large piece of work into an ordered sequence of small, independently mergeable pull requests — before any code is written. |
+| [`functional-core-imperative-shell`](skills/functional-core-imperative-shell) | Write or restructure code so decisions live in a pure functional core and side effects (DB, network, time, randomness) sit in a thin imperative shell. Elixir-first; principles general. |
 
 ---
 
@@ -63,6 +64,29 @@ The skill is then discovered automatically. Trigger it by asking things like:
 
 Resolving merge conflicts, rebasing/squashing, story-point estimation, reviewing an existing PR,
 microservice/architecture design, or speeding up review turnaround.
+
+---
+
+## `functional-core-imperative-shell`
+
+Separates the code that **decides** from the code that **acts**. Business rules, validation,
+calculations, and state transitions go in a **functional core** of pure functions (data in, data
+out, no I/O); everything impure — database, network, queues, the clock, randomness, UUIDs, logging —
+lives in a thin **imperative shell** that wraps the core. The shell calls the core; the core never
+calls the shell. The payoff: the core is deterministic, so it's tested with plain input/output
+assertions and *no mocks*, and the shell shrinks to thin glue.
+
+It guides both **writing new code** and **refactoring** tangled code (the "needs the DB and mocks
+the HTTP client to test" function) into a pure core + thin shell. **Elixir-first** — Ecto changesets
+as a pure validation core, `Repo`/`Ecto.Multi` at the edge, GenServer as a thin shell over a pure
+`Impl` module, Mox + behaviours for boundary tests, `with` for railway sequencing — but the
+principles are language-agnostic.
+
+It is deliberately **not dogmatic**: it tells you to skip FC/IS for thin CRUD/glue and for set-based
+or streaming database work (let the DB decide), warns that "a green core is not a green system"
+(budget shell integration tests), and flags the predicate-in-shell anemic-core smell. The cited
+sources and the over-stated/refuted claims are in
+[`skills/functional-core-imperative-shell/references/evidence.md`](skills/functional-core-imperative-shell/references/evidence.md).
 
 ## License
 
