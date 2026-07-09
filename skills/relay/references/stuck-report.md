@@ -34,5 +34,6 @@ abandoned; where the run directory is>
 ```
 
 Both attempt sections quote the implement-slice failure reports (or, for baton-verification
-failures, the stand-in verdict blocks) — don't re-summarize evidence into vagueness. Options must be genuinely different decisions (re-cut differently, change the
-approach, drop the feature, do it manually), not three phrasings of "try again".
+failures, the stand-in verdict blocks) — don't re-summarize evidence into vagueness. Options must
+be genuinely different decisions (re-cut differently, change the approach, drop the feature, do it
+manually), not three phrasings of "try again".

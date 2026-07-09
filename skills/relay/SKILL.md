@@ -80,9 +80,9 @@ For each leg N in order:
    > Read <implement-slice SKILL.md path> and follow it exactly. Slice spec: <leg N's block from
    > slices.md>. Base branch: <leg N-1's branch, or the default branch for leg 1>. Working branch:
    > <leg N's branch>. Handoff-in: <contents>. Learnings: <contents of learnings.md>. Write your
-   > plan.md, review.md, and outgoing baton (via the handoff skill at <handoff SKILL.md path>) to
-   > <run dir>/legs/N/. Report back: PR URL (or pr.md path), deviations from the slice spec, and
-   > any new one-line learnings.
+   > plan.md, review.md, and outgoing baton as handoff-out.md (via the handoff skill at <handoff
+   > SKILL.md path>) to <run dir>/legs/N/. Report back: PR URL (or pr.md path), deviations from
+   > the slice spec, and any new one-line learnings.
 
 3. On success: append reported learnings to `learnings.md` (one-line actionable rules only —
    dedupe against existing lines; if the file exceeds ~30 lines, dispatch a consolidation pass
@@ -101,7 +101,9 @@ For each leg N in order:
 
 3. On `fail`: dispatch a fixer with the draft, the verdict, and the diff; then re-verify. Two
    consecutive fails → treat as a leg failure (protocol below), with the two verdict blocks and
-   the draft baton standing in for the implement-slice failure report.
+   the draft baton standing in for the implement-slice failure report. On `pass` with DEAD WEIGHT
+   findings, dispatch the fixer to apply the listed trims — they are required, not optional — then
+   proceed; deletions need no re-verification.
 4. The verified baton becomes `legs/N+1/handoff-in.md`.
 
 ## Phase 4 — Anchor leg
@@ -126,7 +128,10 @@ On a leg failure report:
 1. **Re-plan once.** Dispatch a fresh planner with: the failure report, `slices.md`,
    `learnings.md`, and the failed leg's artifacts. It may re-scope the failed leg or re-cut it
    *and all unstarted legs* (never completed ones). It updates `slices.md` with a note of what
-   changed. Resume the leg loop at the failed leg.
+   changed. For a baton double-fail specifically, the leg's branch and PR stand — the re-plan
+   targets the handoff itself (a fresh writer working from the diff), re-opening the code only if
+   the verification failures show the code misrepresents the slice spec. Resume the leg loop at
+   the failed leg.
 2. **Second failure of the same leg → halt.** Write `<run dir>/stuck-report.md` (format:
    `references/stuck-report.md`), set `status.md` to `halted`, and stop. Do not attempt later
    legs — they build on the failed one. Merged/open PRs from completed legs remain valid;

@@ -102,11 +102,13 @@ full [`implement-slice`](skills/implement-slice) loop on a stacked branch, and a
 **baton** ([`handoff`](skills/handoff)) passes between legs. You come back to a stack of small
 reviewable PRs, mergeable bottom-up, plus distilled learnings.
 
-Context rot is the enemy it's built against: every leg starts at zero context, batons are hard-
-capped and audited for bloat, and run-local learnings are one-line rules with a consolidation
-cap. A failed leg gets one evidence-informed re-plan; a second failure halts the run with a
-stuck-report written for a human decision. All run state lives on disk under `.relay/<run-id>/`,
-so a dead session resumes where it stopped.
+Context rot is the enemy it's built against: every leg starts at zero context, batons are
+hard-capped and audited for bloat, and run-local learnings are one-line rules with a
+consolidation cap. A failed leg gets one evidence-informed re-plan; a second failure halts the run
+with a stuck-report written for a human decision. All run state lives on disk under
+`.relay/<run-id>/`, so a dead session resumes where it stopped.
+
+---
 
 ## `implement-slice`
 
@@ -115,6 +117,8 @@ state (never build on sand), plan with an explicit test list, implement test-fir
 diff with 3–4 parallel single-lens subagents (correctness, tests, integration, simplification),
 fix P1/P2 findings, then verify the real flow end-to-end before opening the PR. Useful standalone
 on any scoped task; it's also the engine `relay` dispatches per leg.
+
+---
 
 ## `handoff`
 
