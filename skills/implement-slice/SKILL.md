@@ -65,6 +65,9 @@ diff, the slice spec, and (if present) the handoff-in:
   fix the code or report the baton. (Skip this lens when there's no handoff.)
 - **simplification** — reuse missed, dead weight, abstraction the slice doesn't need.
 
+If your environment cannot dispatch subagents, run each lens yourself as a separate, explicit
+sequential pass over the diff — and say so in `review.md`.
+
 Triage every finding: **P1** (must fix — correctness or spec violation), **P2** (should fix —
 real but bounded), **P3** (note only). Fix all P1s and P2s. Log P3s in `review.md` (run
 directory) or the PR body. Re-run the full suite after fixes.

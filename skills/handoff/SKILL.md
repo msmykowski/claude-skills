@@ -64,7 +64,8 @@ Section guidance:
 - **World state** — what exists and works *now*. One line per capability. Present tense, no
   history, no adjectives.
 - **Interfaces you'll build on** — `file:line` pointers plus signatures and a one-line contract.
-  Never paste function bodies; the reader has the code.
+  Never paste function bodies; the reader has the code. Take pointers from the branch tip you are
+  handing off, not from memory — post-review fix commits shift line numbers.
 - **Decisions and deviations** — every departure from the plan or spec, with its why. Every
   approach tried and abandoned, so the reader doesn't re-walk dead ends. This is where the
   embarrassing stuff goes; the embarrassing stuff is the valuable stuff.
