@@ -56,6 +56,23 @@ can obey without context. Never narrative.
 Discipline: dedupe before appending; soft cap ~30 lines — at the cap, the orchestrator dispatches
 a consolidation pass (merge overlapping rules, drop ones only relevant to completed legs).
 
+## summary.md
+
+Written once, by the anchor leg. The reader is the human reviewing the stack:
+
+```markdown
+# Run summary: <run-id>
+Result: complete — <n> legs, <n> PRs, mergeable bottom-up
+
+| Leg | PR                     | Delivers   |
+|-----|------------------------|------------|
+| 1   | <url or legs/1/pr.md>  | <one line> |
+
+Read first: <what a reviewer should know before the stack — deviations, notable logged P3s,
+or "nothing unusual">
+Compounded: <CLAUDE.md rules added / docs/solutions entry / "nothing — run taught nothing new">
+```
+
 ## legs/<n>/ contents
 
 - `handoff-in.md` — the baton this leg received (leg 1: problem.md contents).

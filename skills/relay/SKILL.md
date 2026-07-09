@@ -100,7 +100,8 @@ For each leg N in order:
    > only the verdict block.
 
 3. On `fail`: dispatch a fixer with the draft, the verdict, and the diff; then re-verify. Two
-   consecutive fails → treat as a leg failure (protocol below).
+   consecutive fails → treat as a leg failure (protocol below), with the two verdict blocks and
+   the draft baton standing in for the implement-slice failure report.
 4. The verified baton becomes `legs/N+1/handoff-in.md`.
 
 ## Phase 4 — Anchor leg
