@@ -34,7 +34,7 @@ Rewritten (not appended) by the orchestrator at every transition:
 
 ```markdown
 # Status: <run-id>
-Run:        active | halted | complete
+Run:        planned | active | halted | complete
 Active leg: <n>
 Phase:      decompose | implement | baton-pass | anchor
 
@@ -46,6 +46,8 @@ Phase:      decompose | implement | baton-pass | anchor
 
 `Phase` is the run's position; a leg's `Status` reuses the same tokens (`implement`,
 `baton-pass`) while that leg is the active one, then settles to `done` or `failed`.
+`Run: planned` means plan mode finished Phase 1 and is waiting for the user's go — the race
+plan on disk (with any user edits) is authoritative when the run starts.
 
 ## learnings.md
 

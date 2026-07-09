@@ -1,16 +1,17 @@
 ---
 name: relay
 description: >-
-  Use when a problem is too large to implement well in one context and the user wants it built
-  end-to-end autonomously — decompose it into vertically-sliced legs, implement each leg in a
-  fresh subagent at full rigor, pass a bounded verified handoff (baton) between legs, and finish
-  with a stack of small reviewable PRs plus distilled learnings. Trigger on "build this whole
-  feature autonomously", "run a relay on this", "decompose and implement this end to end",
-  "implement this as a stack of small PRs while I'm away", or pointing at a large
-  ticket/epic/spec and asking for the full build. Self-contained: bundles its decomposition,
-  per-leg implementation, and handoff manuals under references/. Requires a git repo. Don't use
-  for single PR-sized tasks (follow references/leg-manual.md directly), planning-only requests
-  (use decompose), or work that needs human decisions mid-run.
+  Use when a problem is too large to implement well in one context — decompose it into
+  vertically-sliced legs, implement each leg in a fresh subagent at full rigor, pass a bounded
+  verified handoff (baton) between legs, and finish with a stack of small reviewable PRs plus
+  distilled learnings. Two modes: plan (produce the reviewable race plan and stop) and run
+  (execute it end-to-end autonomously — the default, or the continuation of an approved plan).
+  Trigger on "build this whole feature autonomously", "run a relay on this", "plan a relay",
+  "break this down so I can review before you build", "implement this as a stack of small PRs
+  while I'm away", or pointing at a large ticket/epic/spec. Self-contained: bundles its
+  decomposition, per-leg, and handoff manuals under references/. Requires a git repo. Don't use
+  for single PR-sized tasks (follow references/leg-manual.md directly), quick PR-split advice
+  with no run intended (use decompose), or work needing human decisions mid-implementation.
 ---
 
 # Relay — Implement Large Work as Fresh-Context Legs
@@ -24,6 +25,22 @@ Your role is orchestration only: dispatch subagents, route batons, track state. 
 implement, review, or write handoffs yourself — fresh contexts do, because fresh context is the
 entire quality mechanism. Keep your own context small: everything durable lives on disk, and you
 hold only the race plan, the active leg, and pointers.
+
+## Modes
+
+Pick the mode from the user's ask:
+
+- **Plan** — the user wants the breakdown to review before anything is built ("plan a relay",
+  "break this down first", "what would the legs be?"). Run Phase 1 only, set `status.md` to
+  `Run: planned`, present the race plan (legs, sizes, branches, sequencing rationale, judge
+  notes), and stop.
+- **Run** — the user asked for the build. Run all phases. This is the default when the ask is
+  to implement.
+
+A run left in `planned` is continued by asking for the build ("run it", "go"): skip Phase 1 and
+start the leg loop from `race-plan.md` **as it stands on disk** — if the user edited it during
+review, the edited plan is authoritative; don't second-guess it, but do re-derive each leg's
+`Base`/`Branch` fields if legs were added, removed, or reordered.
 
 ## Preconditions
 
@@ -72,6 +89,9 @@ File formats: `references/state-files.md`. Write `problem.md` first, verbatim �
    this is the only place the two vocabularies meet. Assign each leg its branch name
    (`relay/<run-id>/leg-<n>`, leg 1 based on the default branch, each later leg based on the
    previous leg's branch), and initialize `status.md`.
+
+   **Plan mode stops here**: set `Run: planned`, present the race plan to the user, and point
+   them at `race-plan.md` — they can edit it directly before telling you to run.
 
 ## Phase 2 — The leg loop
 
@@ -144,4 +164,5 @@ On a leg failure report:
 ## Resuming
 
 If your session died mid-run: read `status.md` — it names the active leg and phase. Resume
-exactly there. Never redo a completed leg; its branch, PR, and verified baton are on disk.
+exactly there. Never redo a completed leg; its branch, PR, and verified baton are on disk. A run
+in `Run: planned` resumes at the start of the leg loop (Phase 2), honoring the plan on disk.

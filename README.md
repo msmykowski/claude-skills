@@ -100,6 +100,10 @@ stacked branch, and a bounded, verified **baton** (a ≤150-line handoff, audite
 diff) passes between legs. You come back to a stack of small reviewable PRs, mergeable bottom-up,
 plus distilled learnings.
 
+It works in **two modes**: *plan* ("plan a relay") stops after the judged decomposition and hands
+you the race plan to review — a file you can edit directly — and *run* executes it, either
+straight from the ask or as the continuation of a plan you approved.
+
 Context rot is the enemy it's built against: every leg starts at zero context, batons are
 hard-capped and audited for bloat, and run-local learnings are one-line rules with a
 consolidation cap. A failed leg gets one evidence-informed re-plan; a second failure halts the run
