@@ -108,7 +108,8 @@ For each leg N in order:
 
 After the last leg, dispatch one final subagent:
 
-> Read everything under <run dir> (slices, learnings, statuses, PR links). Two jobs. (1) Distill
+> Read everything under <run dir> (slices, learnings, statuses, PR links), and the summary.md
+> format in <this skill's references/state-files.md path>. Two jobs. (1) Distill
 > learnings.md into persistent compounding: at most a few one-line rules into the repo's
 > CLAUDE.md — but first check they aren't already covered, and if nothing generalizes beyond this
 > run, write nothing. If there is a narrative worth keeping (a non-obvious problem solved),
