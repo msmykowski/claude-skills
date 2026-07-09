@@ -2,10 +2,11 @@
 
 All run state lives in `.relay/<run-id>/`. These formats are contracts: subagents parse them.
 
-## slices.md
+## race-plan.md
 
-The judge's final decomposition, in the decompose skill's output format, with two fields added
-per chunk (`Branch`, and `Base`) and a header:
+The judge's final decomposition, in the decompose manual's output format, with two fields added
+per chunk (`Branch`, and `Base`) and a header. Each `PR<n>` chunk is one **leg** — the two
+vocabularies map 1:1:
 
 ```markdown
 # Race plan: <run-id>
@@ -24,7 +25,7 @@ PR2. ...
   Base:       relay/<run-id>/leg-1
 ```
 
-If the failure protocol re-cuts slices, append a line to Judge notes:
+If the failure protocol re-cuts legs, append a line to Judge notes:
 `Re-cut after leg <n> failure: <what changed>`.
 
 ## status.md
@@ -37,11 +38,14 @@ Run:        active | halted | complete
 Active leg: <n>
 Phase:      decompose | implement | baton-pass | anchor
 
-| Leg | Branch                  | Status                              | PR    |
-|-----|-------------------------|-------------------------------------|-------|
-| 1   | relay/<run-id>/leg-1    | done                                | <url> |
-| 2   | relay/<run-id>/leg-2    | implementing | baton | failed | todo | —     |
+| Leg | Branch                  | Status                                  | PR    |
+|-----|-------------------------|-----------------------------------------|-------|
+| 1   | relay/<run-id>/leg-1    | done                                    | <url> |
+| 2   | relay/<run-id>/leg-2    | todo | implement | baton-pass | failed  | —     |
 ```
+
+`Phase` is the run's position; a leg's `Status` reuses the same tokens (`implement`,
+`baton-pass`) while that leg is the active one, then settles to `done` or `failed`.
 
 ## learnings.md
 

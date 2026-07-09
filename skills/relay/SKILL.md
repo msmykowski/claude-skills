@@ -13,16 +13,17 @@ description: >-
   (use decompose), or work that needs human decisions mid-run.
 ---
 
-# Relay — Run the Whole Race
+# Relay — Implement Large Work as Fresh-Context Legs
 
-Implement a large problem end-to-end, autonomously, as a sequence of vertically-sliced **legs**.
-Each leg runs in a fresh subagent at full quality; a bounded, verified **baton** passes between
-legs; the output is a stack of small reviewable PRs, mergeable bottom-up.
+Implement a large problem end-to-end, autonomously, as an ordered sequence of **legs** — one
+vertical slice of the work each. Each leg runs in a fresh subagent; a bounded, verified **baton**
+(the handoff document) passes between legs; the output is a stack of small reviewable PRs,
+mergeable bottom-up.
 
-You are the **coach with the clipboard, not a runner**. You dispatch subagents, route batons, and
-track state. You never implement, review, or write handoffs yourself — fresh contexts do, because
-fresh context is the entire quality mechanism. Keep your own context small: everything durable
-lives on disk, and you hold only the race plan, the active leg, and pointers.
+Your role is orchestration only: dispatch subagents, route batons, track state. You never
+implement, review, or write handoffs yourself — fresh contexts do, because fresh context is the
+entire quality mechanism. Keep your own context small: everything durable lives on disk, and you
+hold only the race plan, the active leg, and pointers.
 
 ## Preconditions
 
@@ -40,7 +41,7 @@ Create `.relay/<run-id>/` where run-id is `YYYY-MM-DD-<slug>`:
 ```
 .relay/<run-id>/
   problem.md          # the original ask, verbatim
-  slices.md           # judge-approved race plan (format: references/state-files.md)
+  race-plan.md        # judge-approved leg sequence (format: references/state-files.md)
   learnings.md        # append-only one-line rules; every later agent reads it
   status.md           # active leg, per-leg phase, PR links
   legs/<n>/           # handoff-in.md, plan.md, review.md, handoff-out.md, (pr.md)
@@ -60,16 +61,17 @@ File formats: `references/state-files.md`. Write `problem.md` first, verbatim �
 2. Dispatch **one judge**:
 
    > Here are N independent decompositions of the same problem: <all candidates>. Read
-   > <references/decompose.md path> — its bar is your rubric. Score each candidate: is the first chunk a
-   > thin end-to-end spine? Is every chunk legible and load-bearing? Are correctness floors
+   > <references/decompose.md path> — its bar is your rubric. Score each candidate: is the first
+   > chunk a thin end-to-end spine? Is every chunk legible and load-bearing? Are correctness floors
    > respected? Is sizing honest (~50–200 LOC, ≤400)? Is it the fewest chunks that clear the bar?
    > Then synthesize the winner: take the strongest candidate and graft specific better cuts from
-   > the others. Return the final ordered slice list in the same format, plus one paragraph on what
+   > the others. Return the final ordered chunk list in the same format, plus one paragraph on what
    > you changed and why.
 
-3. Write the result to `slices.md`, assign each leg its branch name (`relay/<run-id>/leg-<n>`,
-   leg 1 based on the default branch, each later leg based on the previous leg's branch), and
-   initialize `status.md`.
+3. Write the result to `race-plan.md`. **Each chunk (PR) in the decomposition becomes one leg** —
+   this is the only place the two vocabularies meet. Assign each leg its branch name
+   (`relay/<run-id>/leg-<n>`, leg 1 based on the default branch, each later leg based on the
+   previous leg's branch), and initialize `status.md`.
 
 ## Phase 2 — The leg loop
 
@@ -79,12 +81,12 @@ For each leg N in order:
    verified `handoff-out.md` from leg N-1.
 2. Dispatch a **fresh implementer**:
 
-   > Read <references/leg-manual.md path> and follow it exactly. Slice spec: <leg N's block from
-   > slices.md>. Base branch: <leg N-1's branch, or the default branch for leg 1>. Working branch:
+   > Read <references/leg-manual.md path> and follow it exactly. Leg spec: <leg N's block from
+   > race-plan.md>. Base branch: <leg N-1's branch, or the default branch for leg 1>. Working branch:
    > <leg N's branch>. Handoff-in: <contents>. Learnings: <contents of learnings.md>. Write your
    > plan.md, review.md, and outgoing baton as handoff-out.md (per the baton manual at
    > <references/baton.md path>) to <run dir>/legs/N/. Report back: PR URL (or pr.md path),
-   > deviations from the slice spec, and any new one-line learnings.
+   > deviations from the leg spec, and any new one-line learnings.
 
 3. On success: append reported learnings to `learnings.md` (one-line actionable rules only —
    dedupe against existing lines; if the file exceeds ~30 lines, dispatch a consolidation pass
@@ -94,11 +96,11 @@ For each leg N in order:
 ## Phase 3 — Baton pass
 
 1. The implementer left a draft at `legs/N/handoff-out.md`. If it's missing, dispatch a writer:
-   read the baton manual, write the baton given the leg's diff, slice spec, and plan.md.
+   read the baton manual, write the baton given the leg's diff, leg spec, and plan.md.
 2. Dispatch a **fresh verifier**:
 
    > Read <references/baton.md path>, verification mode. Draft: <handoff-out.md contents>. The diff:
-   > run `git diff <base branch>...<leg branch>`. Spec and plan: <slice spec + plan.md>. Return
+   > run `git diff <base branch>...<leg branch>`. Spec and plan: <leg spec + plan.md>. Return
    > only the verdict block.
 
 3. On `fail`: dispatch a fixer with the draft, the verdict, and the diff; then re-verify. Two
@@ -112,7 +114,7 @@ For each leg N in order:
 
 After the last leg, dispatch one final subagent:
 
-> Read everything under <run dir> (slices, learnings, statuses, PR links), and the summary.md
+> Read everything under <run dir> (race plan, learnings, statuses, PR links), and the summary.md
 > format in <this skill's references/state-files.md path>. Two jobs. (1) Distill
 > learnings.md into persistent compounding: at most a few one-line rules into the repo's
 > CLAUDE.md — but first check they aren't already covered, and if nothing generalizes beyond this
@@ -127,12 +129,12 @@ Then report to the user: the PR stack, ready to review bottom-up, and where the 
 
 On a leg failure report:
 
-1. **Re-plan once.** Dispatch a fresh planner with: the failure report, `slices.md`,
+1. **Re-plan once.** Dispatch a fresh planner with: the failure report, `race-plan.md`,
    `learnings.md`, and the failed leg's artifacts. It may re-scope the failed leg or re-cut it
-   *and all unstarted legs* (never completed ones). It updates `slices.md` with a note of what
+   *and all unstarted legs* (never completed ones). It updates `race-plan.md` with a note of what
    changed. For a baton double-fail specifically, the leg's branch and PR stand — the re-plan
    targets the handoff itself (a fresh writer working from the diff), re-opening the code only if
-   the verification failures show the code misrepresents the slice spec. Resume the leg loop at
+   the verification failures show the code misrepresents the leg spec. Resume the leg loop at
    the failed leg.
 2. **Second failure of the same leg → halt.** Write `<run dir>/stuck-report.md` (format:
    `references/stuck-report.md`), set `status.md` to `halted`, and stop. Do not attempt later

@@ -1,4 +1,4 @@
-# Handoff — Pass the Baton, Not the Bloat
+# Baton Manual — Write a Bounded Handoff, Verify It Against the Diff
 
 Transfer working context to a reader who has the code, the diff, and the git history — but not
 your head. The handoff (the **baton**) exists to carry exactly what those artifacts cannot say.
