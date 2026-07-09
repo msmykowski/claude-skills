@@ -1,18 +1,3 @@
----
-name: handoff
-description: >-
-  Use when transferring work-in-progress context to a reader who has the code, diff, and git
-  history but not your head — before clearing context, compacting or ending a session, passing
-  work to a fresh agent or next session, or finishing one phase of a multi-phase run. Produces a
-  bounded handoff document (a "baton"): current world state, the interfaces to build on, decisions
-  and deviations with their why, and warnings — a delta, never a chronicle. Also has a
-  verification mode for auditing someone else's handoff against the actual diff for unsupported
-  claims, omissions, and dead weight. Trigger on "write a handoff", "handoff doc", "brain dump
-  before I clear context", "summarize state for the next session/agent", "pass the baton", or
-  "verify this handoff". Don't use for user-facing status updates, PR descriptions, commit
-  messages, or documenting finished work for humans.
----
-
 # Handoff — Pass the Baton, Not the Bloat
 
 Transfer working context to a reader who has the code, the diff, and the git history — but not

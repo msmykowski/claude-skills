@@ -7,9 +7,10 @@ description: >-
   with a stack of small reviewable PRs plus distilled learnings. Trigger on "build this whole
   feature autonomously", "run a relay on this", "decompose and implement this end to end",
   "implement this as a stack of small PRs while I'm away", or pointing at a large
-  ticket/epic/spec and asking for the full build. Requires a git repo. Don't use for single
-  PR-sized tasks (use implement-slice), planning-only requests (use decompose), or work that
-  needs human decisions mid-run.
+  ticket/epic/spec and asking for the full build. Self-contained: bundles its decomposition,
+  per-leg implementation, and handoff manuals under references/. Requires a git repo. Don't use
+  for single PR-sized tasks (follow references/leg-manual.md directly), planning-only requests
+  (use decompose), or work that needs human decisions mid-run.
 ---
 
 # Relay — Run the Whole Race
@@ -27,8 +28,9 @@ lives on disk, and you hold only the race plan, the active leg, and pointers.
 
 - A git repository with a discoverable test command. If the repo has no tests at all, that is
   itself the first leg — the decomposition must include it (a characterization/smoke net).
-- The sibling skills **decompose**, **implement-slice**, and **handoff** installed. Locate their
-  SKILL.md absolute paths now (they live in the same skills directory as this file). Subagent
+- This skill is self-contained: the manuals subagents follow live in this skill's `references/`
+  directory — `decompose.md` (how to cut the work), `leg-manual.md` (how to implement one leg),
+  and `baton.md` (how to write and verify handoffs). Resolve their absolute paths now. Subagent
   contexts start empty — every dispatch below passes the relevant path explicitly.
 
 ## Run directory
@@ -50,15 +52,15 @@ File formats: `references/state-files.md`. Write `problem.md` first, verbatim �
 
 1. Dispatch **2–3 parallel subagents** with the same prompt:
 
-   > Read <decompose SKILL.md path> and follow it. The problem: <contents of problem.md>. Research
-   > the codebase first — structure, existing seams, test setup, what already exists. Produce the
-   > ordered chunk list in the skill's output format, plus the sequencing rationale. Return only
-   > that.
+   > Read <references/decompose.md path> and follow it. The problem: <contents of problem.md>.
+   > Research the codebase first — structure, existing seams, test setup, what already exists.
+   > Produce the ordered chunk list in the manual's output format, plus the sequencing rationale.
+   > Return only that.
 
 2. Dispatch **one judge**:
 
    > Here are N independent decompositions of the same problem: <all candidates>. Read
-   > <decompose SKILL.md path> — its bar is your rubric. Score each candidate: is the first chunk a
+   > <references/decompose.md path> — its bar is your rubric. Score each candidate: is the first chunk a
    > thin end-to-end spine? Is every chunk legible and load-bearing? Are correctness floors
    > respected? Is sizing honest (~50–200 LOC, ≤400)? Is it the fewest chunks that clear the bar?
    > Then synthesize the winner: take the strongest candidate and graft specific better cuts from
@@ -77,31 +79,31 @@ For each leg N in order:
    verified `handoff-out.md` from leg N-1.
 2. Dispatch a **fresh implementer**:
 
-   > Read <implement-slice SKILL.md path> and follow it exactly. Slice spec: <leg N's block from
+   > Read <references/leg-manual.md path> and follow it exactly. Slice spec: <leg N's block from
    > slices.md>. Base branch: <leg N-1's branch, or the default branch for leg 1>. Working branch:
    > <leg N's branch>. Handoff-in: <contents>. Learnings: <contents of learnings.md>. Write your
-   > plan.md, review.md, and outgoing baton as handoff-out.md (via the handoff skill at <handoff
-   > SKILL.md path>) to <run dir>/legs/N/. Report back: PR URL (or pr.md path), deviations from
-   > the slice spec, and any new one-line learnings.
+   > plan.md, review.md, and outgoing baton as handoff-out.md (per the baton manual at
+   > <references/baton.md path>) to <run dir>/legs/N/. Report back: PR URL (or pr.md path),
+   > deviations from the slice spec, and any new one-line learnings.
 
 3. On success: append reported learnings to `learnings.md` (one-line actionable rules only —
    dedupe against existing lines; if the file exceeds ~30 lines, dispatch a consolidation pass
    before continuing). Update `status.md`. Go to Phase 3.
-4. On a failure report (the implement-slice `FAILED:` block): go to the failure protocol.
+4. On a failure report (the leg manual's `FAILED:` block): go to the failure protocol.
 
 ## Phase 3 — Baton pass
 
 1. The implementer left a draft at `legs/N/handoff-out.md`. If it's missing, dispatch a writer:
-   read the handoff skill, write the baton given the leg's diff, slice spec, and plan.md.
+   read the baton manual, write the baton given the leg's diff, slice spec, and plan.md.
 2. Dispatch a **fresh verifier**:
 
-   > Read <handoff SKILL.md path>, verification mode. Draft: <handoff-out.md contents>. The diff:
+   > Read <references/baton.md path>, verification mode. Draft: <handoff-out.md contents>. The diff:
    > run `git diff <base branch>...<leg branch>`. Spec and plan: <slice spec + plan.md>. Return
    > only the verdict block.
 
 3. On `fail`: dispatch a fixer with the draft, the verdict, and the diff; then re-verify. Two
    consecutive fails → treat as a leg failure (protocol below), with the two verdict blocks and
-   the draft baton standing in for the implement-slice failure report. On `pass` with DEAD WEIGHT
+   the draft baton standing in for the leg manual's failure report. On `pass` with DEAD WEIGHT
    findings, dispatch the fixer to apply the listed trims — they are required, not optional — then
    proceed; deletions need no re-verification.
 4. The verified baton becomes `legs/N+1/handoff-in.md`.

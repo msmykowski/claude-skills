@@ -1,19 +1,6 @@
----
-name: implement-slice
-description: >-
-  Use when implementing one well-scoped task or slice (roughly one PR of work, ≤~400 changed
-  lines) with full rigor, especially in a fresh context — orient against inherited state, plan,
-  test-driven implementation, multi-lens review by parallel subagents, fix, then end-to-end
-  verification before opening the PR. Trigger when asked to "implement this task/slice/chunk
-  thoroughly", when executing a single chunk from a decomposition plan, or when dispatched as one
-  leg of a relay run with a handoff and a base branch. Works standalone on any single scoped
-  coding task. Don't use for multi-slice features (decompose first, or use relay), trivial
-  one-line fixes, or exploration/research with no deliverable.
----
-
 # Implement One Slice, at Full Speed
 
-Take one well-scoped task from zero context to an open PR with full rigor. This skill is written
+Take one well-scoped task from zero context to an open PR with full rigor. This manual is written
 to be run by an agent whose entire knowledge is its briefing — read everything you're given
 before touching anything.
 
@@ -80,8 +67,9 @@ directory) or the PR body. Re-run the full suite after fixes.
   Body = what it delivers, deviations from the spec/plan and why, and logged P3s. If there is no
   remote or PR tooling, commit locally and write the would-be PR title and body to `pr.md` in
   your run directory instead.
-- If you're part of a relay run: write your outgoing baton with the **handoff** skill and save it
-  where your briefing told you to.
+- If you're part of a relay run: write your outgoing baton following the **baton manual**
+  (`references/baton.md`, at the path your briefing gave you) and save it where your briefing
+  told you to.
 
 ## Failure report
 

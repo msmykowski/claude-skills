@@ -6,9 +6,7 @@ A small collection of [Claude](https://claude.com/claude-code) skills.
 |-------|--------------|
 | [`decompose`](skills/decompose) | Break a large piece of work into an ordered sequence of small, independently mergeable pull requests — before any code is written. |
 | [`functional-core-imperative-shell`](skills/functional-core-imperative-shell) | Write or restructure code so decisions live in a pure functional core and side effects (DB, network, time, randomness) sit in a thin imperative shell. Elixir-first; principles general. |
-| [`relay`](skills/relay) | Implement a large problem end-to-end, autonomously: decompose into vertical slices, run each in a fresh context, pass verified handoffs between them, ship a stack of small PRs. |
-| [`implement-slice`](skills/implement-slice) | Implement one well-scoped task with full rigor: orient, plan, TDD, multi-lens review, end-to-end verification. |
-| [`handoff`](skills/handoff) | Write (and verify) a bounded context handoff — a "baton" that carries what code and git can't say, without the bloat. |
+| [`relay`](skills/relay) | Implement a large problem end-to-end, autonomously: decompose into vertical slices, run each in a fresh context, pass verified handoffs between them, ship a stack of small PRs. Self-contained — one install. |
 
 ---
 
@@ -96,11 +94,11 @@ sources and the over-stated/refuted claims are in
 ## `relay`
 
 Implements a large problem **end-to-end, autonomously**, as a relay race: the work is decomposed
-into vertically-sliced legs (multi-candidate decomposition with a judge, built on
-[`decompose`](skills/decompose)), each leg is implemented by a **fresh-context agent** running the
-full [`implement-slice`](skills/implement-slice) loop on a stacked branch, and a bounded, verified
-**baton** ([`handoff`](skills/handoff)) passes between legs. You come back to a stack of small
-reviewable PRs, mergeable bottom-up, plus distilled learnings.
+into vertically-sliced legs (multi-candidate decomposition with a judge), each leg is implemented
+by a **fresh-context agent** running a full plan → TDD → multi-lens review → verify loop on a
+stacked branch, and a bounded, verified **baton** (a ≤150-line handoff, audited against the actual
+diff) passes between legs. You come back to a stack of small reviewable PRs, mergeable bottom-up,
+plus distilled learnings.
 
 Context rot is the enemy it's built against: every leg starts at zero context, batons are
 hard-capped and audited for bloat, and run-local learnings are one-line rules with a
@@ -108,25 +106,11 @@ consolidation cap. A failed leg gets one evidence-informed re-plan; a second fai
 with a stuck-report written for a human decision. All run state lives on disk under
 `.relay/<run-id>/`, so a dead session resumes where it stopped.
 
----
-
-## `implement-slice`
-
-Runs **one PR-sized task at full rigor**, designed for a fresh context: orient against inherited
-state (never build on sand), plan with an explicit test list, implement test-first, review the
-diff with 3–4 parallel single-lens subagents (correctness, tests, integration, simplification),
-fix P1/P2 findings, then verify the real flow end-to-end before opening the PR. Useful standalone
-on any scoped task; it's also the engine `relay` dispatches per leg.
-
----
-
-## `handoff`
-
-Writes — and adversarially **verifies** — context handoffs. The baton is a **delta, not a
-chronicle**: ≤150 lines, four sections (world state, interfaces, decisions & deviations,
-warnings), admitting only what the reader can't discover from code, diff, or git log. Verification
-mode audits a draft against the actual diff for unsupported claims, omissions, and dead weight.
-Use it before clearing context, ending a session, or passing work to any fresh agent.
+The skill is **self-contained**: the manuals its subagents follow are bundled under
+[`skills/relay/references/`](skills/relay/references) — `decompose.md` (a copy of the standalone
+`decompose` skill), `leg-manual.md` (the per-leg implementation loop, also useful on its own for
+any single scoped task), and `baton.md` (handoff writing + adversarial verification). Installing
+`relay` is one symlink; nothing else is required.
 
 ## License
 
