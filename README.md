@@ -6,6 +6,7 @@ A small collection of [Claude](https://claude.com/claude-code) skills.
 |-------|--------------|
 | [`decompose`](skills/decompose) | Break a large piece of work into an ordered sequence of small, independently mergeable pull requests — before any code is written. |
 | [`functional-core-imperative-shell`](skills/functional-core-imperative-shell) | Write or restructure code so decisions live in a pure functional core and side effects (DB, network, time, randomness) sit in a thin imperative shell. Elixir-first; principles general. |
+| [`improve-elixir-architecture`](skills/improve-elixir-architecture) | Review Elixir module, context and OTP boundaries; produce an offline report of useful deepening opportunities, then explore a selected candidate. |
 | [`relay`](skills/relay) | Implement a large problem end-to-end, autonomously: decompose into vertical slices, run each in a fresh context, pass verified handoffs between them, ship a stack of small PRs. Self-contained — one install. |
 
 ---
@@ -88,6 +89,41 @@ or streaming database work (let the DB decide), warns that "a green core is not 
 (budget shell integration tests), and flags the predicate-in-shell anemic-core smell. The cited
 sources and the over-stated/refuted claims are in
 [`skills/functional-core-imperative-shell/references/evidence.md`](skills/functional-core-imperative-shell/references/evidence.md).
+
+---
+
+## `improve-elixir-architecture`
+
+Surveys an Elixir codebase for opportunities to hide more domain behavior behind simpler
+interfaces. It follows recent changes and real callers, applies the deletion test, and produces
+an **offline HTML report** with ranked candidates, source evidence, before/after relationships,
+tradeoffs and behavioral verification. It can conclude that no refactor is worthwhile.
+
+The guidance covers ordinary modules and Phoenix contexts, OTP ownership and recovery,
+LiveView asynchronous work, Ecto transactions, Oban retries, and SQL Sandbox/Mox process
+ownership. Framework-specific references are used only when those dependencies are present.
+Small pure modules, useful facades and intentional process isolation are preserved when they
+already provide good boundaries.
+
+Use **report only** to end after the survey, or select one candidate to explore its interface
+and migration design. The survey leaves application code unchanged. All references are bundled;
+the skill works independently of the other skills in this repository.
+
+Example request after installing the complete `skills/improve-elixir-architecture` folder:
+
+```text
+/improve-elixir-architecture Review this repository, focusing on recently changed contexts. Report only.
+```
+
+A standalone example demonstrates a pure domain operation and tests through its public interface:
+
+```bash
+elixir skills/improve-elixir-architecture/references/reservations.exs
+```
+
+Adapted from Matt Pocock's [architecture survey and deep-module concepts](https://www.aihero.dev/skills-improve-codebase-architecture),
+with Elixir-specific guidance and primary documentation links. The upstream MIT notice is
+preserved in [`skills/improve-elixir-architecture/LICENSE`](skills/improve-elixir-architecture/LICENSE).
 
 ---
 

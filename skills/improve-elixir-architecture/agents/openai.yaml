@@ -1,0 +1,4 @@
+interface:
+  display_name: "Improve Elixir Architecture"
+  short_description: "Review Elixir contexts, modules, and OTP boundaries"
+  default_prompt: "Use $improve-elixir-architecture to review this project's architecture and produce an offline report of the most useful improvements."
